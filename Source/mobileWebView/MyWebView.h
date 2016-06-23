@@ -8,9 +8,6 @@
 class MOBILEWEBVIEW_API MyWebView
 {
 public:
-	MyWebView();
-	~MyWebView();
-    
     static void createWebView(FString URL);
     static void closeWebView();
     
@@ -23,9 +20,10 @@ public:
 };
 
 #if PLATFORM_IOS
-@interface MyWebViewController : UIViewController
+@interface MyWebViewController : UIViewController <UIWebViewDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 @property (nonatomic, strong, readonly) UIWebView* webView;
 @property (nonatomic, strong, readonly) UIButton* closeButton;
+@property (nonatomic, strong, readonly) UIButton* testButton;
 -(void) initSubViews:(NSString *) URL;
 @end
 #endif

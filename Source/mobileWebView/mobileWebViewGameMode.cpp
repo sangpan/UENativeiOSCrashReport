@@ -5,33 +5,6 @@
 
 #include "MyWebView.h"
 
-//void AmobileWebViewGameMode::open()
-//{
-//#if PLATFORM_IOS
-//    dispatch_async(dispatch_get_main_queue(), ^{
-//
-//    WebViewSocialDialog* dialog = [WebViewSocialDialog dialog:@"http://www.naver.com/"];
-//    if (!dialog) NSLog(@"Fail...");
-//    [dialog show];
-//        
-//    });
-//
-//#endif
-//}
-//
-//void AmobileWebViewGameMode::openOldversion()
-//{
-//#if PLATFORM_IOS
-//    dispatch_async(dispatch_get_main_queue(), ^{
-//
-//        OldWebViewDialog* dialog = [OldWebViewDialog dialog:@"http://www.naver.com/"];
-//        
-//        if (!dialog) NSLog(@"Fail...");
-//        [dialog show];
-//    });
-//
-//#endif
-//}
 void AmobileWebViewGameMode::openMyWebView(FString URL)
 {
     MyWebView::createWebView(URL);
@@ -39,7 +12,5 @@ void AmobileWebViewGameMode::openMyWebView(FString URL)
 
 void AmobileWebViewGameMode::openMyWebViewController(FString URL)
 {
-//    MyWebView::closeWebView();
-//    MyWebView::createWebView();
     MyWebView::createWebViewController(URL);
 }
