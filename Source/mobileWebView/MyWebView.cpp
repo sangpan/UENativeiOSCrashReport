@@ -23,7 +23,7 @@ void MyWebView::createWebView(FString URL)
     dispatch_async(dispatch_get_main_queue(), ^{
 
         webView1 = [[UIWebView alloc]initWithFrame:CGRectMake(0, 0, 500, 320)];
-        NSString *urlString = URL;
+        NSString *urlString = [NSString stringWithUTF8String:(TCHAR_TO_ANSI(*URL))];
         NSURL *url = [NSURL URLWithString:urlString];
         NSURLRequest *urlRequest = [NSURLRequest requestWithURL:url];
         [webView1 loadRequest:urlRequest];
