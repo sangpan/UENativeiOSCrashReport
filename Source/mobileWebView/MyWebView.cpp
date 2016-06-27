@@ -22,12 +22,18 @@ void MyWebView::createWebView(FString URL)
 #if PLATFORM_IOS
     dispatch_async(dispatch_get_main_queue(), ^{
 
-        webView1 = [[UIWebView alloc]initWithFrame:CGRectMake(0, 0, 500, 320)];
-        NSString *urlString = [NSString stringWithUTF8String:(TCHAR_TO_ANSI(*URL))];
-        NSURL *url = [NSURL URLWithString:urlString];
-        NSURLRequest *urlRequest = [NSURLRequest requestWithURL:url];
-        [webView1 loadRequest:urlRequest];
-        [[[IOSAppDelegate GetDelegate] RootView] addSubview:webView1];
+//        webView1 = [[UIWebView alloc]initWithFrame:CGRectMake(0, 0, 500, 320)];
+//        NSString *urlString = [NSString stringWithUTF8String:(TCHAR_TO_ANSI(*URL))];
+//        NSURL *url = [NSURL URLWithString:urlString];
+//        NSURLRequest *urlRequest = [NSURLRequest requestWithURL:url];
+//        [webView1 loadRequest:urlRequest];
+//        [[[IOSAppDelegate GetDelegate] RootView] addSubview:webView1];
+       MyInputViewController * myVCInput = [[MyInputViewController alloc] init];
+        
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [myVCInput initView];
+        });
     });
 #endif
 }
@@ -46,11 +52,11 @@ void MyWebView::createWebViewController(FString URL)
 #if PLATFORM_IOS
 
     NSString * nsStrURL = [NSString stringWithUTF8String:(TCHAR_TO_ANSI(*URL))];
-    myVC1 = [[MyWebViewController alloc] init];
+    MyWebViewController * myVC = [[MyWebViewController alloc] init];
     
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        [myVC1 initSubViews:nsStrURL];
+        [myVC initSubViews:nsStrURL];
     });
 #endif
 
@@ -106,18 +112,42 @@ UIViewController * MyWebView::getTopMostViewController()
     if (!topMostViewController) {
         [[NSException exceptionWithName:@"My ............. InvalidOperationException" reason:@" Not found TopMostViewController" userInfo:nil] raise];
     }
+    
+
     [topMostViewController presentViewController:myVC1 animated:YES completion:^{
-//        [[IOSAppDelegate GetDelegate] ToggleSuspend:true];    //Engine Pause after ViewController present. // this can help avoid Crash When Using Webview... But 
+//        [[IOSAppDelegate GetDelegate] ToggleSuspend:true];    //Engine Pause after ViewController present. // this can help avoid Crash When Using Webview... But
      }];
     
+    /*
+    //Second Way
+    [topMostViewController addChildViewController:self];        //self = New ViewController
+    [topMostViewController.view addSubview:self.view];
+    [self beginAppearanceTransition:YES animated:YES];    //???? below code run when setting NO.
+    [UIView
+     animateWithDuration:0.3
+     delay:0.0
+     options:UIViewAnimationOptionCurveEaseOut
+     animations:^(void){
+     //     self.view.alpha = 1.0;
+     CGRect rectScreen = [[UIScreen mainScreen] applicationFrame];
+     self.view.frame = rectScreen;
+     }
+     completion:^(BOOL finished) {
+     [self endAppearanceTransition];
+     [self didMoveToParentViewController:topMostViewController];
+     }
+     ];
+    */
+    
     CGRect rect = [[UIScreen mainScreen] applicationFrame];
+    rect.origin.y = rect.size.height;
     
     //Setting ViewController's root view.
-    myVC1.view	= [[UIView alloc] initWithFrame:rect];
-    myVC1.view.backgroundColor		= [UIColor clearColor];
-    myVC1.view.autoresizesSubviews	= YES;
-    myVC1.view.autoresizingMask		= UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    myVC1.view.contentMode			= UIViewContentModeRedraw;
+    self.view	= [[UIView alloc] initWithFrame:rect];
+    self.view.backgroundColor		= [UIColor clearColor];
+    self.view.autoresizesSubviews	= YES;
+    self.view.autoresizingMask		= UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.view.contentMode			= UIViewContentModeRedraw;
 
     //Make topBar.
 //    UIView* topBar	= [[UIView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(rect), kTopBarHeight)];
@@ -125,8 +155,8 @@ UIViewController * MyWebView::getTopMostViewController()
 //    topBar.backgroundColor	= [UIColor blackColor];
 //    [myVC1.view addSubview:topBar];
     
-    [myVC1.view addSubview:_webView];
-    
+    [self.view addSubview:_webView];
+
     //Make Top-Right Button
     UIImage* buttonImage	= [UIImage imageNamed:kCloseButtonImageName];
     CGRect buttonRect		= CGRectMake(CGRectGetWidth(rect) - buttonImage.size.width, kTopBarHeight, buttonImage.size.width, buttonImage.size.height);
@@ -134,8 +164,8 @@ UIViewController * MyWebView::getTopMostViewController()
     _closeButton.frame		= buttonRect;
     _closeButton.autoresizingMask	= UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleBottomMargin;
     [_closeButton setImage:buttonImage forState:UIControlStateNormal];
-    [_closeButton addTarget:myVC1 action:@selector(_onClose:) forControlEvents:UIControlEventTouchUpInside];
-    [myVC1.view addSubview:_closeButton];
+    [_closeButton addTarget:self action:@selector(_onClose:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:_closeButton];
 
     
     CGRect buttonRect2		= CGRectMake(CGRectGetWidth(rect) - buttonImage.size.width, (2.0 * buttonImage.size.height) +  kTopBarHeight, buttonImage.size.width, buttonImage.size.height);
@@ -143,8 +173,8 @@ UIViewController * MyWebView::getTopMostViewController()
     _testButton.frame		= buttonRect2;
     _testButton.autoresizingMask	= UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleBottomMargin;
     [_testButton setImage:buttonImage forState:UIControlStateNormal];
-    [_testButton addTarget:myVC1 action:@selector(_testFunction:) forControlEvents:UIControlEventTouchUpInside];
-    [myVC1.view addSubview:_testButton];
+    [_testButton addTarget:self action:@selector(_testFunction:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:_testButton];
 }
 - (void)_testFunction:(id)sender
 {
@@ -154,12 +184,12 @@ UIViewController * MyWebView::getTopMostViewController()
             [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
              NSLog(@"repeat This 1!.");
 ////             [[IOSAppDelegate GetDelegate] ToggleSuspend:false];
-//             dispatch_async(dispatch_get_main_queue(), ^{             // can't running this block when using [.. ToggleSuspend:true]; .
-//                NSLog(@"repeat This 2!.");
-//                [self _testFunction:nil];
+             dispatch_async(dispatch_get_main_queue(), ^{             // can't running this block when using [.. ToggleSuspend:true];
+                NSLog(@"repeat This 2!.");
+                [self _testFunction:nil];
 ////                [[IOSAppDelegate GetDelegate] ToggleSuspend:true];
-//            });
-             [self _testFunction:nil];
+            });
+//             [self _testFunction:nil];
              return;
              }];
             return;
@@ -190,10 +220,29 @@ UIViewController * MyWebView::getTopMostViewController()
 }
 - (void)_dismiss
 {
+    NSLog(@"run _dismiss");
+
     [_webView stopLoading];
     [self dismissViewControllerAnimated:YES completion:^{
      }];
 
+    /*
+    [self willMoveToParentViewController:nil];
+    [self beginAppearanceTransition:NO animated:YES];
+    [UIView
+     animateWithDuration:0.3
+     delay:0.0
+     options:UIViewAnimationOptionCurveEaseOut
+     animations:^(void){
+//     self.view.alpha = 0.0;
+     }
+     completion:^(BOOL finished) {
+     [self endAppearanceTransition];
+     [self.view removeFromSuperview];
+     [self removeFromParentViewController];
+     }
+     ];
+     */
 }
 
 #pragma mark - UIViewController Delegate Code
@@ -216,6 +265,81 @@ UIViewController * MyWebView::getTopMostViewController()
     NSLog(@"urlScheme : %@", urlScheme);
     NSLog(@"urlString : %@", urlString);
 
+    return YES;
+}
+
+@end
+
+
+@implementation MyInputViewController
+-(void) initView
+{
+    
+    UIViewController* topMostViewController = MyWebView::getTopMostViewController();
+    
+    if (!topMostViewController) {
+        [[NSException exceptionWithName:@"My ............. InvalidOperationException" reason:@" Not found TopMostViewController" userInfo:nil] raise];
+    }
+    
+    [topMostViewController presentViewController:self animated:YES completion:^{
+     }];
+
+    
+    CGRect rect = [[UIScreen mainScreen] applicationFrame];
+    rect.origin.y = rect.size.height;
+    
+    //Setting ViewController's root view.
+    self.view	= [[UIView alloc] initWithFrame:rect];
+    self.view.backgroundColor		= [UIColor clearColor];
+    self.view.autoresizesSubviews	= YES;
+    self.view.autoresizingMask		= UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.view.contentMode			= UIViewContentModeRedraw;
+    
+    //This TextField cause Crash by Virtual Keyboard Appear <-> Disappear Repeat 
+    _textField = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, rect.size.width-100, 100)];
+    _textField.backgroundColor = [UIColor whiteColor];
+    [_textField setReturnKeyType:UIReturnKeyDone];
+    _textField.delegate = self;
+    [self.view addSubview:_textField];
+    //Make Top-Right Button
+    UIImage* buttonImage	= [UIImage imageNamed:kCloseButtonImageName];
+    CGRect buttonRect		= CGRectMake(CGRectGetWidth(rect) - buttonImage.size.width, kTopBarHeight, buttonImage.size.width, buttonImage.size.height);
+    _closeButton			= [UIButton buttonWithType:UIButtonTypeCustom];
+    _closeButton.frame		= buttonRect;
+    _closeButton.autoresizingMask	= UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleBottomMargin;
+    [_closeButton setImage:buttonImage forState:UIControlStateNormal];
+    [_closeButton addTarget:self action:@selector(_onClose:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:_closeButton];
+    
+    
+    CGRect buttonRect2		= CGRectMake(CGRectGetWidth(rect) - buttonImage.size.width, (2.0 * buttonImage.size.height) +  kTopBarHeight, buttonImage.size.width, buttonImage.size.height);
+    _testButton			= [UIButton buttonWithType:UIButtonTypeCustom];
+    _testButton.frame		= buttonRect2;
+    _testButton.autoresizingMask	= UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleBottomMargin;
+    [_testButton setImage:buttonImage forState:UIControlStateNormal];
+    [_testButton addTarget:self action:@selector(_testFunction:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:_testButton];
+}
+- (void)_testFunction:(id)sender
+{
+
+}
+
+#pragma mark - Close button function.
+- (void)_onClose:(id)sender
+{
+    [self _dismiss];
+}
+- (void)_dismiss
+{
+    NSLog(@"run _dismiss");
+    [self dismissViewControllerAnimated:YES completion:^{
+     }];
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    [textField resignFirstResponder];
     return YES;
 }
 

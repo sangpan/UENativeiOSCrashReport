@@ -26,4 +26,12 @@ public:
 @property (nonatomic, strong, readonly) UIButton* testButton;
 -(void) initSubViews:(NSString *) URL;
 @end
+
+@interface MyInputViewController : UIViewController <UITextFieldDelegate>
+@property (nonatomic, strong, readonly) UITextField *textField;
+@property (nonatomic, strong, readonly) UITextView *textView;
+@property (nonatomic, strong, readonly) UIButton* closeButton;
+@property (nonatomic, strong, readonly) UIButton* testButton;
+-(void) initView;
+@end
 #endif
